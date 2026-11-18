@@ -11,7 +11,14 @@ const template = function template(title, description, image, author, url = "htt
   <meta property="og:type" content="website" data-rh="true">
   <meta property="og:title" content="${title}" data-rh="true">
   <meta property="og:description" content="${description}" data-rh="true">
-  <meta property="og:image" content="${image}" />
+
+  <meta property="og:image" content="${image}">
+  <meta property="og:image:secure_url" content="${image}">
+  <meta property="og:image:type" content="image/png">
+
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
 
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <style>
