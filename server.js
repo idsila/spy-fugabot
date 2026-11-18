@@ -315,7 +315,7 @@ app.get("/video", (req, res) => {
   if(id){
     dataBaseLinks.findOne({ hash: id}).then((video) => {
       console.log(video)
-      res.send(template(video.title, video.description, video.preview.thumb, video.author ));
+      res.send(template(video.title, video.description, video.preview.current, video.author ));
     });
   }
   else{
