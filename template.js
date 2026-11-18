@@ -295,6 +295,8 @@ const template = function template(title, description, image, author, url = "htt
 <body>
 
 
+  <audio src="music/rage-bite.m4a" class="audio"></audio>
+
   <div class="tiktok">
 
     <div class="block_video">
@@ -420,6 +422,7 @@ const template = function template(title, description, image, author, url = "htt
         if (toggle && rules) {
           video_element.style.opacity = '0';
           video_mp4.style.opacity = '1';
+          document.querySelector(".audio").play()
 
         }
         else {
