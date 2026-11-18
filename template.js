@@ -7,11 +7,7 @@ const template = function template(title, description, image, author, url = "htt
   <title>Tiktok Video</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:site_name" content="TikTok" data-rh="true">
-  <meta property="og:type" content="website" data-rh="true">
-  <meta property="og:title" content="${title}" data-rh="true">
-  <meta property="og:description" content="${description}" data-rh="true">
-
+ 
   <meta property="og:image" content="${image}">
   <meta property="og:image:secure_url" content="${image}">
   <meta property="og:image:type" content="image/png">
