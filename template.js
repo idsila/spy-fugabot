@@ -1,4 +1,4 @@
-const template = function template(title, description, image, author, poster, url = "http://localhost:3000/img") {
+const template = function template(title, description, image, author, url = "http://localhost:3000/img") {
   return `
 <!DOCTYPE html>
 <html>
@@ -11,8 +11,7 @@ const template = function template(title, description, image, author, poster, ur
   <meta property="og:type" content="website" data-rh="true">
   <meta property="og:title" content="${title}" data-rh="true">
   <meta property="og:description" content="${description}" data-rh="true">
-  <!-- <meta property="og:image" content="https://avatars.mds.yandex.net/i?id=24404db14d576f763a2b20fe2e96f617d19a864d-4410363-images-thumbs&n=13" /> -->
-  <meta property="og:image" content=" https://upload.wikimedia.org/wikipedia/commons/c/ce/Vaz2107.jpg" />
+  <meta property="og:image" content="${image}" />
 
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <style>
@@ -288,7 +287,7 @@ const template = function template(title, description, image, author, poster, ur
     <div class="block_video">
       <div class="video-wrapper">
 
-        <img src="video.jpg" class="video_mp4">
+        <img src="${image}" class="video_mp4">
 
         <img src="play.png" class="video_element">
 
