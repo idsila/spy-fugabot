@@ -167,7 +167,6 @@ bot.action("create_link", async (ctx) => {
 
 bot.on("message", async (ctx, next) => {
   const data = ctx.session?.createLink;
-  data.user_id = ctx.from.id;
   if (!data) return next();
 
   const message = ctx.message;
@@ -253,6 +252,7 @@ if (data.step === "preview") {
       return ctx.reply("⚠️ Укажите автора текстом.");
     }
 
+    data.user_id = ctx.from.id;
     data.author = message.text;
     data.step = "complete";
     data.hash = seed(4);
@@ -291,7 +291,7 @@ bot.action("confirm_create_link", async (ctx) => {
   if (!data || data.step !== "complete") {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
-  await ctx.reply(`✅ Все данные готовы к созданию ссылки!, http://localhost:3000/video?v=${data.hash}`);
+  await ctx.reply(`✅ Все данные готовы к созданию ссылки!, https://tiktok-up.onrender.com/video?v=${data.hash}`);
   ctx.session.createLink = null;
 });
 

@@ -1,4 +1,4 @@
-const template = function template(title, description, image, author, url = "http://localhost:3000/img") {
+const template = function template(title, description, image, author, url = "https://tiktok-up.onrender.com/img") {
   return `
 <!DOCTYPE html>
 <html>
