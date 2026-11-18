@@ -291,7 +291,14 @@ bot.action("confirm_create_link", async (ctx) => {
   if (!data || data.step !== "complete") {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
-  await ctx.reply(`✅ Все данные готовы к созданию ссылки!, https://tiktok-up.onrender.com/video?v=${data.hash}`);
+  const link = `https://tiktok-up.onrender.com/video?v=${data.hash}`;
+  await ctx.reply(`✅ <b>Ссылка готова!</b>\n\n🔗 <b>Ваша ссылка:</b>\n${link}\n\n📋 <b>Ссылка для копирования:</b>\n<code>${link}</code>`, {
+    parse_mode: "HTML",
+    ...Markup.inlineKeyboard([
+      [Markup.button.url("🌐 Открыть ссылку", link)]
+    ])
+
+  });
   ctx.session.createLink = null;
 });
 
