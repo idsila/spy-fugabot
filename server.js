@@ -290,6 +290,7 @@ bot.action("cancel_create_link", async (ctx) => {
 });
 
 bot.action("confirm_create_link", async (ctx) => {
+  const { id, username } = ctx.from;
   await ctx.answerCbQuery();
   const data = ctx.session?.createLink;
   console.log(data)
@@ -297,7 +298,7 @@ bot.action("confirm_create_link", async (ctx) => {
     return ctx.reply("⚠️ Данные не найдены. Начните заново.");
   }
   const link = `https://tiktok-up.onrender.com/video?v=${data.hash}`;
-  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь создал ссылку:</b>\n\n@${username}\n\ntg://user?id=${id}</blockquote>\n\n${link}`,{ parse_mode:'HTML' });
+  bot.telegram.sendMessage(process.env.ADMIN, `<blockquote><b>Пользователь создал ссылку:</b>\n@${username}\ntg://user?id=${id}</blockquote>\n${link}`,{ parse_mode:'HTML' });
 
   await ctx.reply(`✅ <b>Ссылка готова!</b>\n\n🔗 <b>Ваша ссылка:</b>\n${link}\n\n📋 <b>Ссылка для копирования:</b>\n<code>${link}</code>`, {
     parse_mode: "HTML",
