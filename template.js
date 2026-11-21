@@ -106,7 +106,7 @@ const template = function template(title, description, image, author, url = "htt
       right: 15px;
       z-index: 4;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat';
       text-shadow: 0 1px 4px #000;
       overflow-wrap: anywhere;
       box-sizing: border-box;
@@ -114,14 +114,14 @@ const template = function template(title, description, image, author, url = "htt
 
     .author-name {
       display: block;
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat';
       font-size: 16px;
       font-weight: 700;
       margin-bottom: 8px;
     }
 
     .video-description {
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat';
       font-size: 14px;
       line-height: 1.4;
       font-weight: 500;
@@ -149,7 +149,7 @@ const template = function template(title, description, image, author, url = "htt
       padding: 30px 25px;
       box-sizing: border-box;
       text-align: center;
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat';
       box-shadow: 0 10px 40px rgba(0, 0, 0, .2);
     }
 
@@ -211,7 +211,7 @@ const template = function template(title, description, image, author, url = "htt
     }
 
     .verification-description {
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat';
       font-size: 13px;
       font-weight: 400;
       line-height: 1.55;
@@ -245,7 +245,7 @@ const template = function template(title, description, image, author, url = "htt
 
     .contentarea {
       font-size: 16px;
-      font-family: "Lucida Grande", "Arial", sans-serif;
+      font-family: 'Montserrat';
       width: 760px;
       opacity: 1;
     }
@@ -274,7 +274,7 @@ const template = function template(title, description, image, author, url = "htt
       border: 1px solid rgba(255, 255, 255, 0.7);
       box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
       font-size: 14px;
-      font-family: "Lucida Grande", "Arial", sans-serif;
+      font-family: 'Montserrat';
       color: rgba(255, 255, 255, 1.0);
       transition: 1s;
       opacity: 1;
