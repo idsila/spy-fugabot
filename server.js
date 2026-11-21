@@ -30,7 +30,7 @@ app.use(cors({ methods: ["POST", "GET"] }));
 
 
 function base64(img, id_t) {
-  const current_name = new Date().getTime();
+  const current_name = seed(15);
 
   const matches = img.match(/^data:image\/(\w+);base64,(.+)$/);
   if (!matches) {
